@@ -1,0 +1,51 @@
+extends layout
+
+block content
+    link(rel='stylesheet', href='/Ju Hoon.css')
+    body        
+        .wrapper
+            .selector
+                each user, index in group
+                    #img-group
+                        img(src=user.img, alt='' onclick='onClickImg('+index+')')
+                        input#ids(name=index type='hidden' value=user.id)
+            .datas
+                img#img-main(src=group[0].img, alt="")
+                .studentid
+                    label(for='studentid-main' id='studentid') 학번
+                    p#studentid-main= group[0].studentid
+                .name
+                    label(for='name-main' id='name-team') 이름
+                    p#name-main= group[0].name
+                .info
+                    label(for='info-main' id='info-team') 자기 소개
+                    p#info-main= group[0].info
+    script.
+        var imgGroup = document.querySelectorAll('#img-group');
+        var selected = 0;
+        imgGroup[selected].style.display='none';
+        onClickImg(0);
+
+        function onClickImg(newSelect){
+            imgGroup[selected].style.display='block';
+            imgGroup[newSelect].style.display='none';
+            selected = newSelect;
+            var id = document.getElementsByName(selected)[0].value;
+            fetch('/team/member/'+id,{
+                headers: {
+                    'Accept' : 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method:'GET',
+            }).then((response) =>{
+                if(response.status == '201') return response.json();
+            }).then((member)=>{
+                console.log(member+'');
+                document.getElementById('img-main').src = member.img;
+                document.getElementById('studentid-main').innerHTML = member.studentid;
+                document.getElementById('name-main').innerHTML = member.name;
+                document.getElementById('info-main').innerHTML = member.info;
+            }).catch((err)=>{
+                console.error(err);
+            });
+        }

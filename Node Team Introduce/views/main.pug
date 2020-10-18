@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  link(rel="stylesheet", href="Sung Hoon.css")
+  link(rel='stylesheet' href='https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.css')
+  script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js')
+  script(src='https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.min.js')
+  script.
+    $(document).ready(function(){
+      $('.slider').bxSlider({
+        auto: true, // 자동 재생
+        speed: 1100, // 스피드
+        pause: 2400,  // 변경
+        controls: false,  // 좌우 표시
+        mode: 'fade', // 화면 전환 방식
+        pager: false  //하단 원 표시
+      });
+    });
+  section.page
+    p#main_title 현지 학기제
+      .imageBlock
+        .imageBox
+          div.slider
+            div
+              img.image(src="../images/fukuoka1.jpg", alt="")
+              p.title 쿠마모토 성<br><br> 이 성은 1877년 세이난 전쟁으로 <br>많은 건물이 소실되었다.<br>현재의 천수각은 1960년에 재건된 것이다.
+            div
+              img.image(src="../images/fukuoka2.jpg", alt="")
+              p.title 야나가와 뱃놀이 선착장<br><br> 시내를 수로가 종횡으로 흐르기 때문에 <br>물의 수도로 불리고 지쿠고 지방 남서부의 <br>상업의 중심지인 것과 동시에 <br>수로를 사용한 강놀이가 유명하다.
+            div
+              img.image(src="../images/fukuoka3.jpg", alt="")
+              p.title 다자이후텐만구<br><br> 다자이후 시에 위치하고 있는 신사다.<br> 919년에 창건되었으며,<br>일본의 중요문화재로 선정되어 있다.

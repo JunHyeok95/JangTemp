@@ -1,0 +1,14 @@
+extends layout
+
+block content
+
+    form.Align_MyWay(action="/qna", method="post")
+        p 제목
+            input#title_writing(name='title' type="text" placeholder='제목을 입력하세요.' required)
+        p 내용 <br>
+            textarea#content_writing(name='content' cols='50', rows='8' required)
+            c:out(value='${content}')
+        input(type="hidden", name="user" value=user)
+        div.Align_MyWay2
+            a.btn(href="javascript:history.back();") 취소
+            button#save_bt.btn 작성

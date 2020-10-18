@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  .register-page
+    form#register-form(action='/auth/register' method='post')
+      .input-group
+        label(for='register-email') 이메일
+        input#register-email(type='email' name='email')
+      .input-group
+        label(for='register-nick') 닉네임
+        input#register-nick(type='text' name='nick')
+      .input-group
+        label(for='register-password') 비밀번호
+        input#register-password(type='password' name='password')
+      if registerError
+        .error-message= registerError
+      button#register-btn.btn(type='submit') 회원가입

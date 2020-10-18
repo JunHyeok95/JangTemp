@@ -1,0 +1,16 @@
+@font-face { 
+    font-family: 'sangFont'; 
+    src: url('/fonts/NanumGothic.ttf');
+    } 
+@font-face {
+    font-family: 'catFont';
+    src: url('/fonts/HoonWhitecatR.ttf');
+}
+    
+    pre, p , label, button, h2, input, textarea, a{ 
+        font-family:'catFont' !important; 
+    }
+    .profile, .table-container{ 
+        font-family:'catFont' !important; 
+    }
+    

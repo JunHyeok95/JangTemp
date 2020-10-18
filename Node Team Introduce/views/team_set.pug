@@ -1,0 +1,183 @@
+extends layout
+
+block content
+    link(rel='stylesheet', href='/Ju Hoon.css')
+    .wrapper#setwrap
+        .selector
+            #img-group
+                img(src='../images/plus.png' alt='' )#btn-new
+            .imgs
+        .data
+            .img-preview
+                img#img-preview(src='../images/q.png' width='250' alt='그림을 선택하세요!')
+                input#img-url(type='hidden' name='url' value='../images/q.png')
+                div
+                    label(for='img' id='add-img') 사진추가
+                    input#img(type='file' accept='image/*' name='img')
+            input#id(name='id' type='hidden' value='')
+            .totaldiv
+                .studentid
+                    label(for='studentid-new') 학번
+                    div
+                        input#studentid-new(name='studentid')
+                .name
+                    label(for='name-new') 이름
+                    div
+                        input#name-new(name='name')
+                .info
+                    label(for='info-new') 자기 소개
+                    div
+                        textarea#info-new(cols='30' rows='5' name='info')
+            .buttondiv
+                button#new-btn(type='submit') 저장
+                button#save-btn(type="submit") 수정
+                button#delete-btn(type='submit') 삭제
+    script.
+        var imgGroup = document.querySelectorAll('#img-group');
+        var newBtn = document.getElementById('new-btn');
+        var saveBtn = document.getElementById('save-btn');
+        var selected = 0;
+        function getImgs(){
+            fetch('/team/group', {method: 'GET'})
+            .then((Response) => {
+                if(Response.status == '201'){
+                    return Response.json();
+            }}).then((resultJson)=> {
+                var group = resultJson;
+                var imgs = document.querySelector('.imgs');
+                imgs.innerHTML = ''
+                var incre = 0;
+                group.map((member) => {
+                    var imgGroup = document.createElement('div');
+                    imgGroup.id = 'img-group';
+                    var img  = document.createElement('img');
+                    img.setAttribute('onclick', 'onClickImg('+(incre+1)+');');
+                    img.src = member.img
+                    var input = document.createElement('input');
+                    input.setAttribute( 'name', incre+1 );
+                    input.type = 'hidden';
+                    input.value = member.id;
+                    imgGroup.appendChild(img);		
+                    imgGroup.appendChild(input);
+                    imgs.appendChild(imgGroup);
+                    incre++;
+                });
+                imgGroup = document.querySelectorAll('#img-group');
+            });
+        };   
+        getImgs();
+
+        document.getElementById('btn-new').addEventListener('click',(e)=>{
+             onCreate();
+        });
+
+        newBtn.addEventListener('click',(e)=>{
+            var studentid = document.getElementById('studentid-new').value;
+            var name = document.getElementById('name-new').value;
+            var info = document.getElementById('info-new').value;
+            var url = document.getElementById('img-url').value;
+            fetch('/team',{
+                headers: {
+                    'Accept' : 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method:'POST',
+                body: JSON.stringify({studentid,name,info,url})     
+            }).then(() =>{
+                getImgs();
+                onCreate();
+            }).catch((err)=>{console.log(err);});
+        });
+        
+        saveBtn.addEventListener('click',(e)=>{
+            var id = document.getElementsByName(selected)[0].value;
+            var studentid = document.getElementById('studentid-new').value;
+            var name = document.getElementById('name-new').value;
+            var info = document.getElementById('info-new').value;
+            var url = document.getElementById('img-url').value;
+            fetch('/team/set/'+id,{
+                headers: {
+                    'Accept' : 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method:'PATCH',
+                body: JSON.stringify({studentid,name,info,url})     
+            }).then(() =>{
+                getImgs();
+                onCreate();
+            }).catch((err)=>{console.log(err);});
+        });
+        document.getElementById('delete-btn').addEventListener('click',(e)=>{
+            onCreate();
+        });
+
+        function onCreate(){
+            newBtn.style.display='inline-block';
+            saveBtn.style.display='none';
+            imgGroup[selected].style.display='inline-block';
+            document.getElementById('img-url').value = '../images/q.png';
+            document.getElementById('img-preview').src = '../images/q.png';
+            document.getElementById('studentid-new').value = '';
+            document.getElementById('name-new').value = '';
+            document.getElementById('info-new').value = '';
+        }
+
+        document.querySelector('#delete-btn').addEventListener('click',(e)=>{
+            var id = document.getElementsByName(selected)[0].value;
+            imgGroup[selected].style.display='inline-block';
+            selected=0;
+            fetch('/team/set/'+id,{
+                headers: {
+                    'Accept' : 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method:'DELETE',       
+            }).then(() =>{
+                getImgs();
+                onCreate();
+            }).catch((err)=>{console.log(err);});
+        });
+
+        function onClickImg(newSelect){
+            newBtn.style.display='none';
+            saveBtn.style.display='inline-block';
+            imgGroup[selected].style.display='inline-block';
+            imgGroup[newSelect].style.display='none';
+            selected = newSelect;
+            var id = document.getElementsByName(selected)[0].value;
+            document.getElementById('id').value = id;
+            fetch('/team/member/'+id,  {
+                headers: {
+                    'Accept' : 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method:'GET',          
+            }).then((response) =>{
+                if(response.status == '201') return response.json();
+            }).then((member)=>{
+                document.getElementById('img-url').value = member.img;
+                document.getElementById('img-preview').src = member.img;
+                document.getElementById('studentid-new').value = member.studentid;
+                document.getElementById('name-new').value = member.name;
+                document.getElementById('info-new').value = member.info;
+            }).catch((err)=>{
+                console.error(err);
+            });
+        }
+
+        document.getElementById('img').addEventListener('change', function(e){
+            var formData = new FormData();
+            formData.append('img', this.files[0]);
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function(){
+                if(xhr.status === 200) {
+                    var url = JSON.parse(xhr.responseText).url;
+                    document.getElementById('img-url').value = url;
+                    document.getElementById('img-preview').src = url;
+                }else{
+                    console.error(xhr.responseText);
+                }
+            };   
+            xhr.open('POST', '/team/img');
+            xhr.send(formData);
+        });

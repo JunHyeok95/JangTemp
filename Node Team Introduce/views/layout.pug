@@ -1,0 +1,31 @@
+doctype
+html
+  head
+    meta(charset='UTF-8')
+    title= title
+    meta(name='viewport' content='width=device-width, user-scalable=no')
+    meta(http-equiv='X-UA-Compatible' content='IE=edge')
+    link(rel='stylesheet' href='/main.css')
+    link(rel='stylesheet' href='/font.css')
+  body
+    .container
+      .profile-wrap
+        .profile
+          if user
+            nav
+              a.btn(href="/") HOME
+              a.btn(href="/gallery") 현지 학기제
+              a.btn(href='/team/') 조원 소개
+              if user && user.email=="root@node"
+                a.btn(href='/team/set') 조원 셋팅
+              a.btn(href="/qna") 질의 응답
+              a#logout.btn(href='/auth/logout') 로그아웃
+            .user-name= '안녕하세요! ' + user.nick + '님'
+            input#my-id(type='hidden' value=user.id)
+          else
+            nav
+              a.btn(href="/") HOME
+              a.btn(href="/gallery") 현지 학기제
+              a.btn(href='/login') 로그인
+              a.btn(href='/register') 회원가입
+      block content

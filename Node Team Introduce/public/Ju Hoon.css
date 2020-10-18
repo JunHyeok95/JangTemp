@@ -1,0 +1,154 @@
+.wrapper{
+  margin: 0 auto;
+  margin-top: 3%;
+  margin-bottom: 3%;
+  padding-top: 3%;
+  padding-bottom: 3%;
+  display: flex;
+  width: 100%;
+  height: 80%;
+  border: 1px solid slategray;
+  border-radius: 15px;
+}
+#img-group > img{
+  border:1px solid #fff;
+  border-radius: 10px;
+}
+#img-group > img:hover{
+  border:5px solid rgb(33, 77, 224);
+}
+.data{
+  border-radius: 10px;
+  background: #16222a7F;;
+  display: block;
+}
+.datas{
+  width: 100%;
+  margin-right: 3%;
+  border-radius: 10px;
+  background: #16222a7F;;
+  display: block;
+  text-align: center;
+  margin-left: 3%;
+}
+
+
+.data img{
+  height: 40%;
+  width: 40%;
+}
+ /* ------------- 추가 css ----------- */
+.selector img{
+  width: 100%;
+  height: 120px;
+  margin: 0 auto;
+  border:2px solid blue;
+}
+.selector{
+  width: 15%;
+  margin-left: 3%;
+}
+.data{
+  width: 75%;
+  margin: 0 5%;
+  height: 100%;
+  padding: 2%;
+}
+.img-preview{
+  margin: 0 auto;
+  margin-bottom: 3%;
+  width: 100%;
+  padding-bottom: 2%;
+  padding-top: 2%;
+  background: rgba(27, 45, 71, 0.5);
+  border-radius: 15px;
+  text-align: center;
+}
+#img-preview{
+  position: relative;
+  height: 60%;
+  width: 40%;
+  margin-bottom: 2%;
+  border-radius: 15px;
+}
+.img-preview div{
+  margin: 0 auto;
+  width: 160px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 20px;
+  background-color: black;
+  border-radius: 20px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.totaldiv{
+  display: block;
+  margin-bottom: 2%;
+  padding: 2%;
+  background: rgba(27, 45, 71, 0.5);
+  border-radius: 15px;
+}
+#studentid-new, #name-new{
+  font-size: 28px;
+  font-weight: bold;
+}
+p{
+  margin-block-start: 0;
+  margin-block-end: 0;
+}
+
+label{
+  font-size: 28px;
+  color: #EEEEEE;
+}
+#studentid, #name-team, #info-team{
+  color: #BBBBBB;
+}
+#add-img{
+  color: #EEEEEE;
+}
+
+#info-new{
+  resize: none;
+  box-sizing: content-box;
+  width: 93%;
+  height: 100%;
+  font-size: 1em;
+  font-weight: bold;
+  grid-auto-rows: 100%;
+}
+
+button {
+  display: inline-block;
+  padding: 0 5px;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 4px;
+  background: -webkit-linear-gradient(top, rgb(0,37,103) 0%,rgb(0,87,166) 50%,rgb(0,74,152) 51%,rgb(75,135,182) 100%);
+  border: 1px solid silver;
+  color: #EEEEEE;
+  height: 37px;
+  line-height: 37px;
+  vertical-align: top;
+  font-size: 30px;
+  margin: 1%;
+  margin-left: 2%;
+  margin-right: 2%;
+}
+
+.dataView{
+  text-align: center;
+  margin-left: 10%;
+  width: 70%;
+}
+#img-main{
+  margin-top: 3%;
+  width: 40%;
+  border-radius: 15px;
+}
+
+#setwrap{
+  height: 100%;
+}

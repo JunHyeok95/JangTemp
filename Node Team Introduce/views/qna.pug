@@ -1,0 +1,178 @@
+extends layout
+
+block content
+  link(rel='stylesheet' href='/QnA.css')
+  div#useriddiv
+    if user && user.email=="root@node"
+      input#useridinput(type='hidden' value=user.email)
+    else
+      input#useridinput(type='hidden' value="user")
+  div#qna_div
+    table.table-container
+      thead
+        tr
+          th
+            h1 번호
+          th
+            h1 제목
+          th
+            h1 작성자
+          th
+            h1 작성일
+      each question, index in list
+        tbody(name=question.id)
+          tr#title
+            td
+              p#id= question.id
+            td
+              p= question.title
+            td
+              p= question.nick
+            td
+              p= question.created_at.toLocaleString()
+          tr#content(style='display:none')
+            td(colspan=4)
+              p= 'Q : ' +question.content
+              if user && user.email=="root@node"
+                button#btn-delete(onClick='onDeleteQuestion('+question.id+');') 삭제
+    div#Align_Right
+      a.btn(href="/writing") 글 작성하기
+    script.
+      //- 답변 달기 필요한 부분
+      var adminname = document.querySelector('#useridinput').value;
+      console.log(adminname);
+      //- 답변 달기 필요한 부분
+      var selected = -1;
+      document.querySelectorAll('#title').forEach(function (e){
+        e.addEventListener('click',function(){
+          let id = e.querySelector('#id').innerHTML;
+          onClick(id);
+        });
+      });
+      function onClick(id){
+        let selectedElements = document.querySelectorAll('.selectedElement');
+        let body = document.getElementsByName(id)[0];
+        console.log(selected, id);
+        if(selected != -1){
+          document.getElementsByName(selected)[0].querySelector('#content').style.display = 'none';
+          for(var el of selectedElements)
+            el.remove();
+        }
+        if(selected != id){
+          body.querySelector('#content').style.display = 'table-row';
+          selected = id;
+        }
+        else{
+          selected = -1;
+          return;
+        }
+        let tr = document.createElement('tr');
+        let td = document.createElement('td');
+
+        // 답변달기 창 제작
+        if(adminname == "root@node"){
+          tr = document.createElement('tr');
+          tr.className = 'selectedElement';
+          td = document.createElement('td');
+          td.colSpan = 4;
+          let textarea = document.createElement('textarea');
+          textarea.id='answerValue';
+          textarea.style.width='95%';
+          let button = document.createElement('button');
+          button.innerHTML = '답변달기';
+          button.className = 'btn-submit';
+          button.addEventListener('click', (e)=>{
+            let comment = document.querySelector('#answerValue').value;
+            onSubmit(id,comment);
+          });
+          td.appendChild(textarea);
+          td.appendChild(button);
+          tr.appendChild(td);
+          body.appendChild(tr);
+        }
+        // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+        fetch('/qna/comment/'+id, {method: 'GET'})
+        .then((Response) => {
+          if(Response.status == '201'){
+            return Response.json();
+          }
+        }).then((resultJson) => {
+          resultJson.map((comment) => {
+            tr = document.createElement('tr');
+            tr.className = 'selectedElement';
+            tr.setAttribute('name','comment/'+comment.id);
+            td = document.createElement('td');
+            td.colSpan = 4;
+            let p = document.createElement('p');
+            p.innerHTML = 'A : ' + comment.comment;
+            p.id = 'comment_p';
+            // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            if(adminname == "root@node"){
+              let button = document.createElement('button');
+              button.innerHTML = '삭제';
+              button.id = 'comment_button';
+              button.setAttribute('onClick', 'onDeleteComment('+comment.id+');');
+              td.appendChild(button);
+            }
+            // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+              td.appendChild(p);
+              tr.appendChild(td);
+
+            body.appendChild(tr)
+          });
+        });       
+      }
+      function onSubmit(id, comment){
+        if(!comment)
+          return;
+        fetch('/qna/comment',{
+          headers: {
+            'Accept' : 'application/json',
+            'Content-Type': 'application/json'
+          },
+          method:'POST',
+          body: JSON.stringify({id, comment})     
+          })
+        .then((Response) => {
+          if(Response.status == '201'){
+              return Response.json();
+          }
+        }).then((res) => {
+          let body = document.getElementsByName(id)[0];
+          let tr = document.createElement('tr');
+          tr.className = 'selectedElement';
+          tr.setAttribute('name','comment/'+res.id);
+          let td = document.createElement('td');
+          td.colSpan = 4;
+          let p = document.createElement('p');
+          p.innerHTML = 'A : ' + comment;
+          p.id = 'comment_p';
+          let button = document.createElement('button');
+          button.innerHTML = '삭제';
+          button.id = 'comment_button';
+          console.log(res.id);
+          button.setAttribute('onClick', 'onDeleteComment('+res.id+');');
+          td.appendChild(p);
+          td.appendChild(button);
+          tr.appendChild(td);
+          body.appendChild(tr);
+          document.querySelector('#answerValue').value = '';
+        });
+      }
+      function onDeleteQuestion(id){
+        fetch('/qna/question/' +id,{
+          method:'DELETE'
+        }).then(()=>{
+          document.getElementsByName(id)[0].remove();
+          selected = -1;
+        })
+      }
+      function onDeleteComment(id){
+        console.log('adsf');
+        fetch('/qna/comment/' +id,{
+          method:'DELETE'
+        }).then(()=>{
+          document.getElementsByName('comment/'+id)[0].remove();
+        })
+      }

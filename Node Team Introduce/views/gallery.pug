@@ -1,0 +1,127 @@
+extends layout
+
+block content
+  .timeline
+    if user && user.email=="root@node"
+      div
+        form#twit-form(action='/post' method='post' enctype='multipart/form-data')
+          .input-group
+            textarea#twit(name='content' maxlength=140)
+          .img-preview
+            img#img-preview(src='' style='display: none;' width='250' alt='미리보기')
+            input#img-url(type='hidden' name='url')
+          div
+            label#img-label(for='img') 사진 업로드
+            input#img(type='file' accept='image/*')
+            button#twit-btn.btn(type='submit') 업로드
+    .twits#twits
+      for twit in twits
+        .twit
+          input.twit-user-id#user-id(type='hidden' value=twit.user.id)
+          input.twit-id#id(type='hidden' value=twit.id)
+          input.twit-author#author(type='hidden' value=twit.user.nick)
+          input.twit-content#content(type='hidden' value=twit.content)
+          if twit.img
+            .twit-img
+              img(src=twit.img alt='섬네일')
+  script.
+    if (document.getElementById('img')) {
+      document.getElementById('img').addEventListener('change', function (e) {
+        var formData = new FormData();
+        console.log(this, this.files);
+        formData.append('img', this.files[0]);
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          if (xhr.status === 200) {
+            // 이 작업을 fetch 는 프로미스로 처리한다
+            var url = JSON.parse(xhr.responseText).url;
+            document.getElementById('img-url').value = url;
+            document.getElementById('img-preview').src = url;
+            document.getElementById('img-preview').style.display = 'inline';
+          } else {
+            console.error(xhr.responseText);
+          }
+        };
+        xhr.open('POST', '/post/img');
+        xhr.send(formData);
+      });
+    }
+    document.querySelectorAll('.twits .twit').forEach(function (el){
+      el.addEventListener('click', function() {
+        var id = (el.querySelector('.twit-id').value)-1;  // 클릭한 이미지의 아이디 찾기
+        getInfo(id);
+      });
+    });
+    function getInfo(id) {
+      fetch('/info', { method: 'GET' })
+        .then((response) => { // 한번더 리턴 해주는 이유는 ?
+          if(response.status == '200'){
+            return response.json("200번 json 하하"); // 이건 어디로 가는거지?
+          }
+        })
+        .then((resJson) => {
+          //- console.log(resJson);    //  보기가 어렵다
+          const comments = resJson;   //객체로 받아온다.
+          const viewInfo = comments[id];
+          //- console.log(viewInfo);    //  보기가 어렵다
+          //- console.log(JSON.parse(viewInfo)); // 이건 문법 에러다
+          //- console.log(JSON.stringify(viewInfo)); // 이건 직렬화 날아올때 된다
+          //- console.log();
+          //- view.setAttribute();
+          // 들어갈 위젯 만드는 작업 
+          var twits = document.querySelector('.twits');
+          var view = document.createElement('div');
+          var img = document.createElement('img');
+          var str = document.createElement('pre');
+          twits.innerHTML = '';
+          view.id = 'view';
+          img.src = viewInfo.img;
+          str.innerHTML = viewInfo.content;
+          str.id = 'content_text';
+          img.setAttribute('onclick', 'load();' );
+          view.appendChild(img);
+          view.appendChild(str);
+          twits.appendChild(view);
+        })
+        .catch((error) => {
+          console.error('fetch 호출에서 에러발생: ' + error.message);
+        });
+      }
+
+    function load(){
+      fetch('/info/load', { method: 'GET' })
+        .then((response) => { // 한번더 리턴 해주는 이유는 ?
+          if(response.status == '200'){
+          return response.json("200번 json 하하"); // 이건 어디로 가는거지?
+          }
+        })
+        .then((resJson) => {
+          // 화면 꾸미기
+          const infos = resJson;
+          var twits = document.querySelector('.twits');
+          twits.innerHTML = '';
+          infos.map((info) => {
+            //- console.log(info);
+            var twit = document.createElement('div');
+            twit.setAttribute('class','twit');
+            var input = document.createElement('input');
+            input.setAttribute('class','twit-id');
+            input.setAttribute('type','hidden');
+            input.setAttribute('value', info.id); // 예외처리 해야함
+            var imgdiv = document.createElement('div');
+            imgdiv.setAttribute('class','twit-img');
+            var img = document.createElement('img');
+            img.src = info.img; // 예외처리 해야함
+
+            twit.setAttribute('onclick', 'getInfo('+(info.id-1)+');' ); // 다시 이벤트 달기
+
+            imgdiv.appendChild(img);
+            twit.appendChild(input);
+            twit.appendChild(imgdiv);
+            twits.appendChild(twit);
+          });
+        })
+        .catch((error) => {
+          console.error('fetch 호출에서 에러발생: ' + error.message);
+        });
+      }
